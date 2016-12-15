@@ -200,7 +200,7 @@ public class Pez extends JLabel implements Runnable{
             //si no hay tiburon, busca un pez del sexo opuesto
             Pez pececito = (Pez)pecesVecinos.get(0);
             if(reproducir && numeroReproducciones > 0){
-                if(!(pececito.getSexo()==this.getSexo())){
+                if(!(pececito.getSexo()==this.getSexo())&& pececito.getReproducir()){
                 	parejaAvista = true;
                     buscarPareja(pececito);
                     if(sexo==2)
@@ -280,6 +280,10 @@ public class Pez extends JLabel implements Runnable{
             reproducir = false;
             numeroReproducciones--;
             tiempoUltimaReproduccion = System.currentTimeMillis();
+            pezDetectado.setReproducir(false);
+            pezDetectado.setNumeroReproducciones(pezDetectado.getNumeroReproducciones()-1);
+            pezDetectado.setTiempoUltimaReproduccion(tiempoUltimaReproduccion);
+            pezDetectado.cambiarDireccion();
             cambiarDireccion();
         }  
             
@@ -332,6 +336,38 @@ public class Pez extends JLabel implements Runnable{
 
 	public void setSexo(int sexo) {
 		this.sexo = sexo;
+	}
+
+	public boolean getReproducir() {
+		return reproducir;
+	}
+
+	public void setReproducir(boolean reproducir) {
+		this.reproducir = reproducir;
+	}
+
+	public int getNumeroReproducciones() {
+		return numeroReproducciones;
+	}
+
+	public void setNumeroReproducciones(int numeroReproducciones) {
+		this.numeroReproducciones = numeroReproducciones;
+	}
+
+	public long getTiempoUltimaReproduccion() {
+		return tiempoUltimaReproduccion;
+	}
+
+	public void setTiempoUltimaReproduccion(long tiempoUltimaReproduccion) {
+		this.tiempoUltimaReproduccion = tiempoUltimaReproduccion;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 }

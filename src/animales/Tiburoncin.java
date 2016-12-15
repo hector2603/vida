@@ -65,6 +65,7 @@ public class Tiburoncin extends JLabel implements Runnable{
         	//System.out.println(velocidad);
             while(true){
             	//System.out.println(reproducir+"   desde pez "+id);
+            	mover();
             	verEntorno();             
                 setBounds(posX, posY, 30, 30);
                 if(tiempoUltimaComida+tiempoAumentarVelocidad > System.currentTimeMillis() ){
@@ -93,7 +94,6 @@ public class Tiburoncin extends JLabel implements Runnable{
         ArrayList<Component> pecesComida = new ArrayList<>();// arreglo de componente obtenidos del canvas 
         int areaX = posX-radio;
         int areaY = posX-radio;
-        mover(); 
         for(int i = areaY; i <= areaY+(radio*2); i+=10){
             for(int j = areaX; j <= areaX+(radio*2); j+=10){
                 Component objeto = canvas_pecera.getComponentAt(j, i);
@@ -121,17 +121,19 @@ public class Tiburoncin extends JLabel implements Runnable{
             if(pecesComida.get(i).getClass() != this.getClass()){// el objeto es diferente de un tiburon
             	pez = (Pez)pecesComida.get(i);
             	pezAvista = true;
+            	System.out.println("encontré comida "+pez.getId());
                 break;
             }
         }
-        if(!pezAvista){
+        if(pezAvista){
         	//si dejo que se busque pez, se dejan de mover los tiburones
         	//Pez pezComida = (Pez)pecesComida.get(0);
-        	//buscarPez(pezComida);
+        	buscarPez(pez);
+        	comerPez(pecesComida); 
         }
-        if(pezAvista){
+        /*if(pezAvista){
             comerPez(pez);  
-        }
+        }*/
     }
 	
 	public void buscarPez(Pez pezComida){
@@ -167,18 +169,22 @@ public class Tiburoncin extends JLabel implements Runnable{
             return angulo;
     }
 	
-	 public void comerPez(Pez pezDetectado){
+	 public void comerPez(ArrayList<Component> pezDetectado){
 	        Area miEspacio = new Area(this.getBounds());
-	        Area EspacioPez = new Area(pezDetectado.getBounds());
-	        /* Si las areas de ambos peces estan intersectadas */
-	        if(miEspacio.intersects(EspacioPez.getBounds())){
-	           //matar pez
-	        	System.out.println("Comio");
-	        	pezDetectado.vivito = false;
-	        	pezDetectado.remover();
-	            tiempoUltimaComida = System.currentTimeMillis();
-	            velocidad=10;
-	        }  
+	        for(int i = 0; i < pezDetectado.size(); i++){
+	        	Pez pezcomida = (Pez)pezDetectado.get(i);
+		        Area EspacioPez = new Area(pezcomida.getBounds());
+		        /* Si las areas de ambos peces estan intersectadas */
+		        if(miEspacio.intersects(EspacioPez.getBounds())){
+		           //matar pez
+		        	System.out.println("Comio");
+		        	pezcomida.vivito = false;
+		        	pezcomida.remover();
+		            tiempoUltimaComida = System.currentTimeMillis();
+		            velocidad=10;
+		        }  
+	        }
+
 	            
 	    }
 	
