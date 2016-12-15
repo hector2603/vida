@@ -32,7 +32,7 @@ public class Pez extends JLabel implements Runnable{
 	private int numeroReproducciones=5; // numero máximo de reproducciones que puede terner el pececito 
 	private long tiempoUltimaReproduccion; // el tiempo en el que tuvo la ultima reproduccion para poder validar, cuando se puede volver a reproducir
 	private int tiempoEntreReproduccion = 5000; // tiempo entre reproduccion
-	private int tiempoDeVida = 1000000;
+	private int tiempoDeVida = 10;
 	
 	public Pez(JPanel canvas,int i,int rango,int tiempoParaSerGrande,int numeroDeReproducciones, int timeEntreReproduccion, int timeOfLife){
 		id = i;
@@ -41,7 +41,7 @@ public class Pez extends JLabel implements Runnable{
 		tiempoParaReproducir = tiempoParaSerGrande;
 		numeroReproducciones = numeroDeReproducciones;
 		tiempoEntreReproduccion = timeEntreReproduccion;
-		tiempoDeVida = timeOfLife;
+		tiempoDeVida = timeOfLife*1000;
         inicializarPez();
 	}
 	
@@ -52,6 +52,7 @@ public class Pez extends JLabel implements Runnable{
 		tiempoParaReproducir = this.tiempoParaReproducir;
 		numeroReproducciones = this.numeroReproducciones;
 		tiempoEntreReproduccion = this.tiempoEntreReproduccion;
+		tiempoDeVida = this.tiempoDeVida*1000;
         inicializarPez();
 	}
 	
@@ -86,9 +87,9 @@ public class Pez extends JLabel implements Runnable{
                 setBounds(posX, posY, 30, 30);
                 if(inicioDeVida+tiempoParaReproducir<System.currentTimeMillis() && tiempoUltimaReproduccion+tiempoEntreReproduccion < System.currentTimeMillis()  ){
                 	reproducir = true;
-                }if(tiempoDeVida > System.currentTimeMillis()){
-                	mover=false;
-                	System.out.println("muere");
+                }if(tiempoDeVida+inicioDeVida < System.currentTimeMillis()){   
+                	System.out.println("muere" + this.id);
+                	this.stopPez();
                 }
                 Thread.sleep(10);
             }

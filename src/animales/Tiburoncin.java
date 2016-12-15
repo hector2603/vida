@@ -169,9 +169,9 @@ public class Tiburoncin extends JLabel implements Runnable{
 	
 	 public void comerPez(Pez pezDetectado){
 	        Area miEspacio = new Area(this.getBounds());
-	        Area EspacioPareja = new Area(pezDetectado.getBounds());
+	        Area EspacioPez = new Area(pezDetectado.getBounds());
 	        /* Si las areas de ambos peces estan intersectadas */
-	        if(miEspacio.intersects(EspacioPareja.getBounds())){
+	        if(miEspacio.intersects(EspacioPez.getBounds())){
 	           //matar pez
 	        	System.out.println("Comio");
 	        	pezDetectado.vivito = false;

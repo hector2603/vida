@@ -198,7 +198,7 @@ public class Ventana extends JFrame implements ActionListener {
 		panel.add(VelocidadInicial);
 		
 		TiempoVida = new JTextField();
-		TiempoVida.setText("1000000");
+		TiempoVida.setText("10");
 		TiempoVida.setColumns(10);
 		TiempoVida.setBounds(177, 208, 117, 20);
 		panel.add(TiempoVida);
