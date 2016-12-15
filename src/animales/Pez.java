@@ -23,7 +23,8 @@ public class Pez extends JLabel implements Runnable{
 	private ImageIcon imagen;
 	private int altura = 561;
 	private int ancho = 661;
-	private boolean vivito;
+	public boolean vivito;
+	public boolean mover;
 	private int radio=100;
 	private boolean reproducir;
 	private long inicioDeVida;
@@ -31,14 +32,26 @@ public class Pez extends JLabel implements Runnable{
 	private int numeroReproducciones=5; // numero máximo de reproducciones que puede terner el pececito 
 	private long tiempoUltimaReproduccion; // el tiempo en el que tuvo la ultima reproduccion para poder validar, cuando se puede volver a reproducir
 	private int tiempoEntreReproduccion = 5000; // tiempo entre reproduccion
+	private int tiempoDeVida = 1000000;
 	
-	public Pez(JPanel canvas,int i,int rango,int tiempoParaSerGrande,int numeroDeReproducciones, int timeEntreReproduccion){
+	public Pez(JPanel canvas,int i,int rango,int tiempoParaSerGrande,int numeroDeReproducciones, int timeEntreReproduccion, int timeOfLife){
 		id = i;
 		canvas_pecera = canvas;
 		radio = rango;
 		tiempoParaReproducir = tiempoParaSerGrande;
 		numeroReproducciones = numeroDeReproducciones;
 		tiempoEntreReproduccion = timeEntreReproduccion;
+		tiempoDeVida = timeOfLife;
+        inicializarPez();
+	}
+	
+	public Pez(){
+		id = this.id;
+		canvas_pecera = this.canvas_pecera;
+		radio = this.radio;
+		tiempoParaReproducir = this.tiempoParaReproducir;
+		numeroReproducciones = this.numeroReproducciones;
+		tiempoEntreReproduccion = this.tiempoEntreReproduccion;
         inicializarPez();
 	}
 	
@@ -58,6 +71,7 @@ public class Pez extends JLabel implements Runnable{
         //asigna el pez la posición inicial
 		setBounds(posX, posY, 30, 30);
 		vivito = true ;
+		mover = true;
 		reproducir= false;
 	}
 	
@@ -67,13 +81,16 @@ public class Pez extends JLabel implements Runnable{
         	inicioDeVida = System.currentTimeMillis();
         	tiempoUltimaReproduccion = inicioDeVida;
             while(vivito){
-            	System.out.println(reproducir+"   desde pez "+id);
+            	//System.out.println(reproducir+"   desde pez "+id);
             	verEntorno();             
                 setBounds(posX, posY, 30, 30);
                 if(inicioDeVida+tiempoParaReproducir<System.currentTimeMillis() && tiempoUltimaReproduccion+tiempoEntreReproduccion < System.currentTimeMillis()  ){
                 	reproducir = true;
+                }if(tiempoDeVida > System.currentTimeMillis()){
+                	mover=false;
+                	System.out.println("muere");
                 }
-                Thread.sleep(10); 
+                Thread.sleep(10);
             }
         }catch(InterruptedException e){}
 	}
@@ -83,6 +100,11 @@ public class Pez extends JLabel implements Runnable{
             Hilo = new Thread(this);
             Hilo.start();
         }
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void stopPez(){
+         Hilo.stop();
 	}
 	
     public void mover(){
@@ -157,7 +179,6 @@ public class Pez extends JLabel implements Runnable{
         if(!pecesVecinos.isEmpty()){
             seleccionarAccion(pecesVecinos);
         }
-
     }
 
     public void seleccionarAccion(ArrayList<Component> pecesVecinos){
@@ -173,7 +194,7 @@ public class Pez extends JLabel implements Runnable{
             }
         }
                 
-        if(!tiburonAvista){
+        if(!tiburonAvista && mover){
         	//System.out.println("entro sin tiburon");
             //si no hay tiburon, busca un pez del sexo opuesto
             Pez pececito = (Pez)pecesVecinos.get(0);
@@ -186,13 +207,38 @@ public class Pez extends JLabel implements Runnable{
                 }
             }
         }
-        if(tiburonAvista){
-            //evitarTiburon(tiburoncin);  
+        if(tiburonAvista && mover){
+            evitarTiburon(tiburoncin);  
         }
         /*if(!parejaAvista && !tiburonAvista){
         	mover();// en el caso de que no hayan tiburones y los peces vecinos sean del mismo sexo, se sigue moviendo
         }
   */
+    }
+    
+    public void evitarTiburon(Tiburoncin tiburon){
+        int x,y;
+        //encuentra el ángulo que hay entre los dos peces 
+        double angulo = anguloEntrePuntos(this.posX, this.posY, tiburon.getPosX(), tiburon.getPosY());
+        if(angulo <= 20 || angulo > 340){
+            x = -1; y = 0;
+        }else if(angulo > 20 && angulo <= 70){
+            x = -1; y = -1;
+        }else if(angulo > 70 && angulo <= 110){
+            x = 0; y = -1;
+        }else if(angulo > 110 && angulo <= 160){
+            x = 1; y = -1;
+        }else if(angulo > 160 && angulo <= 200){
+            x = 1; y = 0;
+        }else if(angulo > 200 && angulo <= 250){
+            x = 1; y = 1;
+        }else if(angulo > 250 && angulo <= 290){
+            x = 0; y = 1;
+        }else{
+            x = -1; y = 1;
+        }
+        this.oldPosX = x;
+        this.oldPosY = y;
     }
     
     public void buscarPareja(Pez pareja){
@@ -225,7 +271,7 @@ public class Pez extends JLabel implements Runnable{
         Area EspacioPareja = new Area(pezDetectado.getBounds());
         /* Si las areas de ambos peces estan intersectadas */
         if(miEspacio.intersects(EspacioPareja.getBounds())){
-            Pez hijitoAmado = new Pez(canvas_pecera,0,radio,tiempoParaReproducir,numeroReproducciones,tiempoEntreReproduccion);
+            Pez hijitoAmado = new Pez(canvas_pecera,0,radio,tiempoParaReproducir,numeroReproducciones,tiempoEntreReproduccion, tiempoDeVida);
             hijitoAmado.setPosX(posX);
             hijitoAmado.setPosY(posY);
             canvas_pecera.add(hijitoAmado);
@@ -236,6 +282,10 @@ public class Pez extends JLabel implements Runnable{
             cambiarDireccion();
         }  
             
+    }
+    
+    public void remover(){
+    	canvas_pecera.remove(this);
     }
     
     private double anguloEntrePuntos(int x1, int y1, int x2, int y2){
