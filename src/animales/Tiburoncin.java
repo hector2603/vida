@@ -69,8 +69,8 @@ public class Tiburoncin extends JLabel implements Runnable{
             	verEntorno();             
                 setBounds(posX, posY, 30, 30);
                 if(tiempoUltimaComida+tiempoAumentarVelocidad > System.currentTimeMillis() ){
-                	if(velocidad == 1){
-                		velocidad = 1;
+                	if(velocidad == 5){
+                		velocidad = 5;
                 	}else{
                 		velocidad = velocidad -1;
                 	}

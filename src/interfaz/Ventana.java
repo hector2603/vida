@@ -1,5 +1,6 @@
 package interfaz;
 
+import java.awt.Component;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -17,15 +18,18 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.SwingUtilities;
 
 import animales.Pez;
 import animales.Tiburoncin;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-public class Ventana extends JFrame implements ActionListener {
+public class Ventana extends JFrame implements ActionListener,MouseListener  {
 
 	static int pecesActuales;
 	private int altura = 561;
@@ -60,6 +64,10 @@ public class Ventana extends JFrame implements ActionListener {
 	private JTextField VelocidadInicial;
 	//Comida
 	private JTextField TazaComida;
+	private JTextField MostrarReproducciones;
+	private JTextField MostrarTiempoVida;
+	private JTextField MostrarVivo;
+	private JTextField MostrarHambre;
 
 	/**
 	 * Launch the application.
@@ -132,7 +140,7 @@ public class Ventana extends JFrame implements ActionListener {
 		panel.add(lblNewLabel_1);
 		
 		numero_tiburones = new JTextField();
-		numero_tiburones.setText("2");
+		numero_tiburones.setText("1");
 		numero_tiburones.setBounds(177, 33, 117, 20);
 		panel.add(numero_tiburones);
 		numero_tiburones.setColumns(10);
@@ -221,6 +229,48 @@ public class Ventana extends JFrame implements ActionListener {
 		TazaComida.setColumns(10);
 		TazaComida.setBounds(177, 233, 117, 20);
 		panel.add(TazaComida);
+		
+		JLabel lblDatos = new JLabel("Datos");
+		lblDatos.setBounds(116, 279, 46, 14);
+		panel.add(lblDatos);
+		
+		JLabel lblNewLabel_3 = new JLabel("Vivo? ");
+		lblNewLabel_3.setBounds(10, 298, 157, 14);
+		panel.add(lblNewLabel_3);
+		
+		MostrarReproducciones = new JTextField();
+		MostrarReproducciones.setBounds(177, 345, 117, 20);
+		panel.add(MostrarReproducciones);
+		MostrarReproducciones.setColumns(10);
+		
+		JLabel lblNewLabel_4 = new JLabel("Tiempo de vida Restante");
+		lblNewLabel_4.setBounds(10, 323, 157, 14);
+		panel.add(lblNewLabel_4);
+		
+		MostrarTiempoVida = new JTextField();
+		MostrarTiempoVida.setColumns(10);
+		MostrarTiempoVida.setBounds(177, 320, 117, 20);
+		panel.add(MostrarTiempoVida);
+		
+		JLabel lblReproduccionesRestantes = new JLabel("Reproducciones Restantes");
+		lblReproduccionesRestantes.setBounds(10, 348, 157, 14);
+		panel.add(lblReproduccionesRestantes);
+		
+		MostrarVivo = new JTextField();
+		MostrarVivo.setColumns(10);
+		MostrarVivo.setBounds(177, 295, 117, 20);
+		panel.add(MostrarVivo);
+		
+		JLabel lblHambre = new JLabel("Hambre");
+		lblHambre.setBounds(10, 373, 157, 14);
+		panel.add(lblHambre);
+		
+		MostrarHambre = new JTextField();
+		MostrarHambre.setColumns(10);
+		MostrarHambre.setBounds(177, 370, 117, 20);
+		panel.add(MostrarHambre);
+		
+		canvas_pecera.addMouseListener(this);
 	}
 	
 	public void actionPerformed(ActionEvent arg0) {
@@ -284,4 +334,37 @@ public class Ventana extends JFrame implements ActionListener {
 
 		
 	}
+	
+    public void mouseClicked(MouseEvent me) {
+    }
+
+
+    public void mousePressed(MouseEvent me) {
+    	if (SwingUtilities.isLeftMouseButton(me)) {
+            //System.out.println(me.getX()+""+me.getY());
+    		Component mostrar = canvas_pecera.getComponentAt(me.getX(), me.getY());
+    		if(mostrar.getClass().getName()=="animales.Pez"){
+    			Pez pececito = (Pez)mostrar;
+    			MostrarReproducciones.setText(""+pececito.getNumeroReproducciones());
+    			double tiempo = (pececito.getTiempoDeVida()-(System.currentTimeMillis()-pececito.getInicioDeVida()))/1000;
+    			MostrarTiempoVida.setText(""+tiempo);
+    			MostrarVivo.setText(pececito.vivito+"");
+    			MostrarHambre.setText(""+pececito.cantidadDeHambre);
+    		}
+            
+        }
+    }
+
+
+    public void mouseReleased(MouseEvent me) {
+
+    }
+
+
+    public void mouseEntered(MouseEvent me) {
+    }
+
+
+    public void mouseExited(MouseEvent me) {
+    }
 }
