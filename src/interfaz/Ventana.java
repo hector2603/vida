@@ -10,6 +10,9 @@ import javax.swing.border.LineBorder;
 import java.awt.Color;
 
 import javax.swing.border.TitledBorder;
+
+import Comida.Comida;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -29,6 +32,7 @@ public class Ventana extends JFrame implements ActionListener {
 	private int ancho = 661;
 	private int numeroPecesIniciales;
 	private int numeroTiburonesIniciales;
+	private int numeroComidaInicial = 10;
 	
 	private JPanel contentPane;
 	private JPanel canvas_pecera;
@@ -38,6 +42,7 @@ public class Ventana extends JFrame implements ActionListener {
 	private JTextField numero_tiburones;
 	private ArrayList<Pez> peces;
 	private ArrayList<Tiburoncin> tiburon;
+	private ArrayList<Comida> comida;
 	private JTextField RangoText;
 	private JLabel lblTiempoParaSer;
 	private JLabel lblNumeroMaxDe;
@@ -45,6 +50,7 @@ public class Ventana extends JFrame implements ActionListener {
 	private JLabel lblTiempoAumentarVelocidad;
 	private JLabel lblVelocidadInicial;
 	private JLabel lblTiempoVida;
+	private JLabel lblTazaComida;
 	private JTextField TiempoGrande;
 	private JTextField TiempoEntreReproduccion;
 	private JTextField MaxReproducciones;
@@ -52,6 +58,8 @@ public class Ventana extends JFrame implements ActionListener {
 	//Tiburón
 	private JTextField TiempoAumentarVelocidad;
 	private JTextField VelocidadInicial;
+	//Comida
+	private JTextField TazaComida;
 
 	/**
 	 * Launch the application.
@@ -76,6 +84,7 @@ public class Ventana extends JFrame implements ActionListener {
 		// inicializar datos de la simulación
 		peces = new ArrayList<>();
 		tiburon = new ArrayList<>();
+		comida = new ArrayList<>();
 		
 		
 		this.setResizable(false);
@@ -123,7 +132,7 @@ public class Ventana extends JFrame implements ActionListener {
 		panel.add(lblNewLabel_1);
 		
 		numero_tiburones = new JTextField();
-		numero_tiburones.setText("10");
+		numero_tiburones.setText("2");
 		numero_tiburones.setBounds(177, 33, 117, 20);
 		panel.add(numero_tiburones);
 		numero_tiburones.setColumns(10);
@@ -167,14 +176,18 @@ public class Ventana extends JFrame implements ActionListener {
 		lblTiempoVida.setBounds(10, 211, 157, 14);
 		panel.add(lblTiempoVida);
 		
+		lblTazaComida = new JLabel("Taza Comida");
+		lblTazaComida.setBounds(10, 236, 157, 14);
+		panel.add(lblTazaComida);
+		
 		TiempoGrande = new JTextField();
-		TiempoGrande.setText("5000");
+		TiempoGrande.setText("5");
 		TiempoGrande.setColumns(10);
 		TiempoGrande.setBounds(177, 83, 117, 20);
 		panel.add(TiempoGrande);
 		
 		TiempoEntreReproduccion = new JTextField();
-		TiempoEntreReproduccion.setText("5000");
+		TiempoEntreReproduccion.setText("5");
 		TiempoEntreReproduccion.setColumns(10);
 		TiempoEntreReproduccion.setBounds(177, 133, 117, 20);
 		panel.add(TiempoEntreReproduccion);
@@ -186,28 +199,35 @@ public class Ventana extends JFrame implements ActionListener {
 		panel.add(MaxReproducciones);
 		
 		TiempoAumentarVelocidad = new JTextField();
-		TiempoAumentarVelocidad.setText("7500");
+		TiempoAumentarVelocidad.setText("10");
 		TiempoAumentarVelocidad.setColumns(10);
 		TiempoAumentarVelocidad.setBounds(177, 158, 117, 20);
 		panel.add(TiempoAumentarVelocidad);
 		
 		VelocidadInicial = new JTextField();
-		VelocidadInicial.setText("10");
+		VelocidadInicial.setText("100");
 		VelocidadInicial.setColumns(10);
 		VelocidadInicial.setBounds(177, 183, 117, 20);
 		panel.add(VelocidadInicial);
 		
 		TiempoVida = new JTextField();
-		TiempoVida.setText("10");
+		TiempoVida.setText("100");
 		TiempoVida.setColumns(10);
 		TiempoVida.setBounds(177, 208, 117, 20);
 		panel.add(TiempoVida);
+		
+		TazaComida = new JTextField();
+		TazaComida.setText("15");
+		TazaComida.setColumns(10);
+		TazaComida.setBounds(177, 233, 117, 20);
+		panel.add(TazaComida);
 	}
 	
 	public void actionPerformed(ActionEvent arg0) {
 		System.out.println("inició");
 		Pez p;
 		Tiburoncin t;
+		Comida c;
 		int rango = Integer.parseInt(RangoText.getText());
 		int TiempoParaSerGrande = Integer.parseInt(TiempoGrande.getText());
 		int MaximoDeReproducciones = Integer.parseInt(MaxReproducciones.getText());
@@ -215,6 +235,8 @@ public class Ventana extends JFrame implements ActionListener {
 		int TimeAumentarVelocidad = Integer.parseInt(TiempoAumentarVelocidad.getText());
 		int TimeVelocidadInicial = Integer.parseInt(VelocidadInicial.getText());
 		int TimeLife = Integer.parseInt(TiempoVida.getText());
+		int tazaComidita = Integer.parseInt(TazaComida.getText());
+		numeroComidaInicial = 10;
 		if(!numero_peces.getText().toString().equals("")){
 			numeroPecesIniciales = Integer.parseInt(numero_peces.getText());
 	        for(int i = 0; i < numeroPecesIniciales; i++){
@@ -242,6 +264,18 @@ public class Ventana extends JFrame implements ActionListener {
 	        for(int i = 0; i < numeroTiburonesIniciales; i++){
 	        	tiburon.get(i).startTiburon();
 	        } 
+		}if(numeroComidaInicial > 0){
+			System.out.println("Comida");
+	        for(int i = 0; i < numeroComidaInicial; i++){
+	        	c = new Comida(canvas_pecera,i,rango,tazaComidita);
+	        	comida.add(c);
+	        	canvas_pecera.add(c);
+	        }
+			canvas_pecera.repaint();
+			canvas_pecera.updateUI();
+			for(int i = 0; i < numeroComidaInicial; i++){
+	        	comida.get(i).startComida();;
+	        }
 		}
 		else{
 			JOptionPane.showMessageDialog(this, "inserte todos los datos");

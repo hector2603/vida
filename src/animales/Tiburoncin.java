@@ -22,15 +22,15 @@ public class Tiburoncin extends JLabel implements Runnable{
 	private int ancho = 661;
 	private int radio=100;
 	private long inicioDeVida;
-	private int tiempoAumentarVelocidad=7500;// tiempo para aumentar velocidad
+	private int tiempoAumentarVelocidad=10;// tiempo para aumentar velocidad
 	private long tiempoUltimaComida; // el tiempo ultimo pez comido
-	private int velocidad = 10;
+	private int velocidad = 100;
 	
 	public Tiburoncin(JPanel canvas,int i,int rango,int tiempoParaAumentarVelocidad, int timeVelocidad){
 		id = i;
 		canvas_pecera = canvas;
 		radio = rango;
-		tiempoAumentarVelocidad = tiempoParaAumentarVelocidad;
+		tiempoAumentarVelocidad = tiempoParaAumentarVelocidad*1000;
 		velocidad = timeVelocidad;
         inicializarTiburon();
 	}
@@ -39,7 +39,7 @@ public class Tiburoncin extends JLabel implements Runnable{
 		/*id = this.id;
 		canvas_pecera = this.canvas_pecera;
 		radio = this.radio;
-		tiempoAumentarVelocidad = this.tiempoAumentarVelocidad;
+		tiempoAumentarVelocidad = this.tiempoAumentarVelocidad*1000;
         inicializarTiburon();*/
 	}
 	
@@ -97,10 +97,10 @@ public class Tiburoncin extends JLabel implements Runnable{
         for(int i = areaY; i <= areaY+(radio*2); i+=10){
             for(int j = areaX; j <= areaX+(radio*2); j+=10){
                 Component objeto = canvas_pecera.getComponentAt(j, i);
-                if(objeto != null && objeto != canvas_pecera && objeto != this){
+                if(objeto != null && objeto != canvas_pecera && objeto.getClass().getName() == "animales.Pez"){
                     if(!pecesComida.isEmpty()){
                         if(pecesComida.get(pecesComida.size()-1) != objeto)
-                        	pecesComida.add(objeto);
+                        	pecesComida.add(objeto);                        	
                     }
                     else
                     	pecesComida.add(objeto);
@@ -121,7 +121,6 @@ public class Tiburoncin extends JLabel implements Runnable{
             if(pecesComida.get(i).getClass() != this.getClass()){// el objeto es diferente de un tiburon
             	pez = (Pez)pecesComida.get(i);
             	pezAvista = true;
-            	System.out.println("encontré comida "+pez.getId());
                 break;
             }
         }

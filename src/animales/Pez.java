@@ -10,6 +10,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import Comida.Comida;
+
 
 
 public class Pez extends JLabel implements Runnable{
@@ -28,19 +30,20 @@ public class Pez extends JLabel implements Runnable{
 	private int radio=100;
 	private boolean reproducir;
 	private long inicioDeVida;
-	private int tiempoParaReproducir=5000;// tiempo para ser grande y poder reproducirse 
+	private int tiempoParaReproducir=5;// tiempo para ser grande y poder reproducirse 
 	private int numeroReproducciones=5; // numero máximo de reproducciones que puede terner el pececito 
 	private long tiempoUltimaReproduccion; // el tiempo en el que tuvo la ultima reproduccion para poder validar, cuando se puede volver a reproducir
-	private int tiempoEntreReproduccion = 5000; // tiempo entre reproduccion
-	private int tiempoDeVida = 10;
+	private int tiempoEntreReproduccion = 5; // tiempo entre reproduccion
+	private int tiempoDeVida = 100;
+	Long cantidadDeHambre=(long) 10000;
 	
 	public Pez(JPanel canvas,int i,int rango,int tiempoParaSerGrande,int numeroDeReproducciones, int timeEntreReproduccion, int timeOfLife){
 		id = i;
 		canvas_pecera = canvas;
 		radio = rango;
-		tiempoParaReproducir = tiempoParaSerGrande;
+		tiempoParaReproducir = tiempoParaSerGrande*1000;
 		numeroReproducciones = numeroDeReproducciones;
-		tiempoEntreReproduccion = timeEntreReproduccion;
+		tiempoEntreReproduccion = timeEntreReproduccion*1000;
 		tiempoDeVida = timeOfLife*1000;
         inicializarPez();
 	}
@@ -49,9 +52,9 @@ public class Pez extends JLabel implements Runnable{
 		id = this.id;
 		canvas_pecera = this.canvas_pecera;
 		radio = this.radio;
-		tiempoParaReproducir = this.tiempoParaReproducir;
+		tiempoParaReproducir = this.tiempoParaReproducir*1000;
 		numeroReproducciones = this.numeroReproducciones;
-		tiempoEntreReproduccion = this.tiempoEntreReproduccion;
+		tiempoEntreReproduccion = this.tiempoEntreReproduccion*1000;
 		tiempoDeVida = this.tiempoDeVida*1000;
         inicializarPez();
 	}
@@ -74,6 +77,7 @@ public class Pez extends JLabel implements Runnable{
 		vivito = true ;
 		mover = true;
 		reproducir= false;
+		cantidadDeHambre=(long) 10000;
 	}
 	
 	@Override
@@ -85,7 +89,12 @@ public class Pez extends JLabel implements Runnable{
             	//System.out.println(reproducir+"   desde pez "+id);
             	verEntorno();             
                 setBounds(posX, posY, 30, 30);
-                if(inicioDeVida+tiempoParaReproducir<System.currentTimeMillis() && tiempoUltimaReproduccion+tiempoEntreReproduccion < System.currentTimeMillis()  ){
+                if (cantidadDeHambre <= 0){
+                	cantidadDeHambre = (long) 0;
+                }else{
+                	cantidadDeHambre -=(long) 20;
+                }
+                if(inicioDeVida+tiempoParaReproducir<System.currentTimeMillis() && tiempoUltimaReproduccion+tiempoEntreReproduccion < System.currentTimeMillis()  ){                	
                 	reproducir = true;
                 }if(tiempoDeVida+inicioDeVida < System.currentTimeMillis()){   
                 	System.out.println("muere" + this.id);
@@ -159,14 +168,16 @@ public class Pez extends JLabel implements Runnable{
     }
     
     public synchronized void verEntorno(){
-        ArrayList<Component> pecesVecinos = new ArrayList<>();// arreglo de componente obtenidos del canvas 
+        ArrayList<Component> pecesVecinos = new ArrayList<>();// arreglo de componente obtenidos del canvas
+        ArrayList<Component> comida = new ArrayList<>(); //arreglo de comida en el entorno
         int areaX = posX-radio;
         int areaY = posX-radio;
         mover(); 
         for(int i = areaY; i <= areaY+(radio*2); i+=10){
             for(int j = areaX; j <= areaX+(radio*2); j+=10){
                 Component objeto = canvas_pecera.getComponentAt(j, i);
-                if(objeto != null && objeto != canvas_pecera && objeto != this){
+                //Aquí porque es diferente????
+                if(objeto != null && objeto != canvas_pecera && objeto != this && objeto.getClass().getName() == "animales.pez"){
                     if(!pecesVecinos.isEmpty()){
                         if(pecesVecinos.get(pecesVecinos.size()-1) != objeto)
                         	pecesVecinos.add(objeto);
@@ -174,11 +185,19 @@ public class Pez extends JLabel implements Runnable{
                     else
                     	pecesVecinos.add(objeto);
                 }
+                if(objeto != null && objeto != canvas_pecera && objeto != this && objeto.getClass().getName() == "Comida.Comida"){
+                    if(!comida.isEmpty()){
+                        if(comida.get(comida.size()-1) != objeto)
+                        	comida.add(objeto);
+                    }
+                    else
+                    	comida.add(objeto);
+                }
             }
-        }
-        
-        if(!pecesVecinos.isEmpty()){
+        }if(!pecesVecinos.isEmpty()){
             seleccionarAccion(pecesVecinos);
+        }if(!comida.isEmpty() && cantidadDeHambre < 5000){
+            buscarComida(comida);
         }
     }
 
@@ -188,7 +207,7 @@ public class Pez extends JLabel implements Runnable{
         boolean parejaAvista = false;
         // primero se busca si en el arreglo de objetos del canvas hay un tiburon
         for(int i = 0; i < pecesVecinos.size(); i++){
-            if(pecesVecinos.get(i).getClass() != this.getClass()){// el objeto es diferente de un pez
+            if(pecesVecinos.getClass().getName() == "animales.Tiburoncin"){// el objeto es diferente de un pez
             	tiburoncin = (Tiburoncin)pecesVecinos.get(i);
             	tiburonAvista = true;
                 break;
@@ -215,6 +234,22 @@ public class Pez extends JLabel implements Runnable{
         	mover();// en el caso de que no hayan tiburones y los peces vecinos sean del mismo sexo, se sigue moviendo
         }
   */
+    }
+    
+    public void buscarComida(ArrayList<Component> comida){    
+        if(cantidadDeHambre<5000){
+            Comida comidita = (Comida)comida.get(0);
+            
+            Area miEspacio = new Area(this.getBounds());
+            Area EspacioComida = new Area(comidita.getBounds());
+            /* Si las areas de ambos estan intersectadas */
+            if(miEspacio.intersects(comidita.getBounds())){
+            	System.out.println("Pez Comio Matas");
+            	comidita.remover();
+	            cantidadDeHambre=(long) 10000;
+            } 
+            
+        }
     }
     
     public void evitarTiburon(Tiburoncin tiburon){
@@ -272,7 +307,8 @@ public class Pez extends JLabel implements Runnable{
         Area EspacioPareja = new Area(pezDetectado.getBounds());
         /* Si las areas de ambos peces estan intersectadas */
         if(miEspacio.intersects(EspacioPareja.getBounds())){
-            Pez hijitoAmado = new Pez(canvas_pecera,0,radio,tiempoParaReproducir,numeroReproducciones,tiempoEntreReproduccion, tiempoDeVida);
+        	System.out.println("Reproduccion");
+            Pez hijitoAmado = new Pez(canvas_pecera,0,radio,tiempoParaReproducir*1000,numeroReproducciones,tiempoEntreReproduccion*1000, tiempoDeVida);
             hijitoAmado.setPosX(posX);
             hijitoAmado.setPosY(posY);
             canvas_pecera.add(hijitoAmado);
